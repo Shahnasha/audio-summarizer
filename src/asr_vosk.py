@@ -2,6 +2,8 @@ import json
 import wave
 from vosk import Model, KaldiRecognizer
 
+# def hget_model(model_name):
+    # pass
 
 def transcribe_file(wav_path, model_path):
     """
