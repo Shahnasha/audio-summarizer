@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vox — Audio Summarizer</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- Ambient background -->
+  <div class="bg-grain"></div>
+  <div class="bg-glow bg-glow--1"></div>
+  <div class="bg-glow bg-glow--2"></div>
+
+  <!-- ─── Header ─────────────────────────────────────── -->
+  <header class="header">
+    <div class="header__brand">
+      <div class="header__icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
+      <h1 class="header__title">Vox</h1>
+      <span class="header__badge">Offline</span>
+    </div>
+    <p class="header__tagline">Upload or record audio. Get the essence.</p>
+  </header>
+
+  <!-- ─── Main Container ─────────────────────────────── -->
+  <main class="main">
+
+    <!-- Upload Zone -->
+    <section id="upload-zone" class="upload-zone">
+
+      <!-- Mode Tabs -->
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-upload" data-mode="upload">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload file
+        </button>
+        <button class="mode-tab" id="tab-record" data-mode="record">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          Record audio
+        </button>
+      </div>
+
+      <!-- Upload Panel -->
+      <div class="upload-zone__inner" id="dropzone">
+        <div class="upload-zone__icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <h2 class="upload-zone__title">Drag & drop your audio file</h2>
+        <p class="upload-zone__subtitle">or click to browse — WAV, MP3, M4A, FLAC, OGG, WebM up to 100 MB</p>
+        <input type="file" id="file-input" accept="audio/*" hidden>
+        <button class="btn btn--primary" id="browse-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Choose file
+        </button>
+      </div>
+
+      <!-- Record Panel -->
+      <div class="recorder" id="recorder-panel" hidden>
+        <div class="recorder__visual">
+          <canvas id="waveform-canvas" class="recorder__canvas"></canvas>
+          <div class="recorder__timer" id="rec-timer">00:00</div>
+        </div>
+        <div class="recorder__controls">
+          <button class="rec-btn rec-btn--start" id="rec-start-btn" title="Start recording">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+          </button>
+          <button class="rec-btn rec-btn--stop" id="rec-stop-btn" title="Stop recording" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+          </button>
+          <button class="rec-btn rec-btn--pause" id="rec-pause-btn" title="Pause" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          </button>
+        </div>
+        <p class="recorder__hint" id="rec-hint">Click the red button to start recording</p>
+      </div>
+
+      <!-- Recording preview (shown after recording stops) -->
+      <div class="rec-preview" id="rec-preview" hidden>
+        <div class="rec-preview__player">
+          <div class="file-preview__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          </div>
+          <div class="rec-preview__info">
+            <p class="file-preview__name">Recording</p>
+            <p class="file-preview__meta" id="rec-meta">—</p>
+          </div>
+          <audio id="rec-audio-player" class="rec-preview__audio" controls></audio>
+        </div>
+        <div class="file-preview__actions">
+          <button class="btn btn--ghost btn--sm" id="rec-discard-btn">Discard</button>
+          <button class="btn btn--primary" id="rec-process-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Transcribe & Summarize
+          </button>
+        </div>
+      </div>
+
+      <!-- File preview (shown after file selection) -->
+      <div class="file-preview" id="file-preview" hidden>
+        <div class="file-preview__info">
+          <div class="file-preview__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          </div>
+          <div>
+            <p class="file-preview__name" id="file-name">—</p>
+            <p class="file-preview__meta" id="file-meta">—</p>
+          </div>
+        </div>
+        <div class="file-preview__actions">
+          <button class="btn btn--ghost btn--sm" id="clear-btn">Change</button>
+          <button class="btn btn--primary" id="process-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Transcribe & Summarize
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Processing Overlay -->
+    <section id="processing" class="processing" hidden>
+      <div class="processing__spinner"></div>
+      <h2 class="processing__title">Processing your audio…</h2>
+      <p class="processing__step" id="processing-step">Converting audio format</p>
+      <div class="processing__bar">
+        <div class="processing__bar-fill" id="progress-fill"></div>
+      </div>
+    </section>
+
+    <!-- Error -->
+    <section id="error-section" class="error-section" hidden>
+      <div class="error-card">
+        <div class="error-card__icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+        </div>
+        <h3 class="error-card__title">Something went wrong</h3>
+        <p class="error-card__msg" id="error-msg">—</p>
+        <button class="btn btn--primary" id="retry-btn">Try again</button>
+      </div>
+    </section>
+
+    <!-- ─── Results ──────────────────────────────────── -->
+    <section id="results" class="results" hidden>
+
+      <!-- Stats Row -->
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card">
+          <span class="stat-card__value" id="stat-words">—</span>
+          <span class="stat-card__label">Words</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value" id="stat-sentences">—</span>
+          <span class="stat-card__label">Sentences</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value" id="stat-duration">—</span>
+          <span class="stat-card__label">Duration</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__value" id="stat-reading">—</span>
+          <span class="stat-card__label">Read time</span>
+        </div>
+      </div>
+
+      <!-- Summary Card -->
+      <div class="result-card result-card--summary" id="summary-card">
+        <div class="result-card__header">
+          <div class="result-card__badge">Summary</div>
+          <button class="btn btn--icon" title="Copy summary" data-copy="summary-text">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+        <p class="result-card__text" id="summary-text">—</p>
+      </div>
+
+      <!-- Keywords -->
+      <div class="result-card result-card--keywords" id="keywords-card">
+        <div class="result-card__header">
+          <div class="result-card__badge">Keywords</div>
+        </div>
+        <div class="keywords-cloud" id="keywords-cloud"></div>
+      </div>
+
+      <!-- Top Sentences -->
+      <div class="result-card" id="highlights-card">
+        <div class="result-card__header">
+          <div class="result-card__badge">Key Sentences</div>
+        </div>
+        <ol class="highlights-list" id="highlights-list"></ol>
+      </div>
+
+      <!-- Full Transcript -->
+      <div class="result-card" id="transcript-card">
+        <div class="result-card__header">
+          <div class="result-card__badge">Full Transcript</div>
+          <div class="result-card__actions">
+            <button class="btn btn--icon" title="Copy transcript" data-copy="transcript-text">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button class="btn btn--icon" title="Download transcript" id="download-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="transcript-body" id="transcript-text">—</div>
+      </div>
+
+      <!-- New Upload -->
+      <div class="results__footer">
+        <button class="btn btn--ghost" id="new-upload-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Process another file
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" hidden>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toast-msg">Copied!</span>
+  </div>
+
+  <footer class="footer">
+    <p>100% offline · Vosk ASR · Extractive summarization · No data leaves your machine</p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

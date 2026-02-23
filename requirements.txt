@@ -1,0 +1,9 @@
+flask
+vosk
+sentence-transformers
+numpy
+scikit-learn
+librosa
+soundfile
+torch
+pydub          # fallback audio conversion (webm recordings)
