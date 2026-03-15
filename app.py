@@ -5,7 +5,8 @@ import uuid
 from collections import Counter
 from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
-
+from src.preprocess import save_wav_mono_16k
+from src.asr_vosk import transcribe_file
 from src.summarizer_extractive import summarize_extract
 
 UPLOAD_FOLDER = 'uploads'
