@@ -4,13 +4,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Reset & Variables ────────────────────────────────────────── */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+
 
 /* Ensure hidden attribute always works, even when CSS sets display */
 [hidden] {
