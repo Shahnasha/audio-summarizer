@@ -87,6 +87,6 @@ def transcribe_file(wav_path, model_path):
         wf.close()
 
     # Build full transcript from segments
-    full_transcript = " ".join([s.get('text', '').strip() for s in segments])
+    full_transcript = " ".join([s.get('text', '').strip() for s in segments])/
     
     return full_transcript, segments
