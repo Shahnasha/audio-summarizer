@@ -1,1 +1,343 @@
-\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOX — Create account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090c; --surface: #0f1117; --card: #141720; --border: #1e2230;
+    --accent: #e8ff47; --text: #e8eaf0; --muted: #5a5f72; --mid: #8b8fa8;
+    --err: #ff4757; --ok: #4dffb4;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .container { width: 100%; max-width: 480px; }
+  .brand {
+    font-family: 'Outfit', sans-serif; font-weight: 800;
+    font-size: 1.2rem; letter-spacing: 0.12em; color: var(--accent);
+    text-decoration: none; display: block; margin-bottom: 2.5rem;
+  }
+  /* Progress */
+  .progress { display: flex; gap: .5rem; margin-bottom: 2.5rem; }
+  .step-dot {
+    height: 3px; flex: 1; border-radius: 2px;
+    background: var(--border); transition: background .3s;
+  }
+  .step-dot.active { background: var(--accent); }
+  .step-dot.done   { background: rgba(232,255,71,.4); }
+  /* Steps */
+  .step { display: none; }
+  .step.active { display: block; }
+  .step-label {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: .8rem;
+  }
+  h1 {
+    font-family: 'Instrument Serif', serif; font-weight: 400;
+    font-size: 2rem; letter-spacing: -0.015em; margin-bottom: .4rem;
+  }
+  .sub { color: var(--mid); font-size: 0.85rem; margin-bottom: 2rem; line-height: 1.6; }
+  .sub a { color: var(--accent); text-decoration: none; }
+  /* Cards for step 1 */
+  .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-bottom: 1.5rem; }
+  .choice-card {
+    border: 1px solid var(--border); border-radius: 6px; padding: 1.4rem 1.2rem;
+    cursor: pointer; transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .choice-card:hover { border-color: var(--mid); background: var(--card); }
+  .choice-card.selected { border-color: var(--accent); background: rgba(232,255,71,.05); }
+  .choice-card input[type=radio] { position: absolute; opacity: 0; pointer-events: none; }
+  .choice-icon { font-size: 1.5rem; margin-bottom: .7rem; }
+  .choice-title { font-weight: 600; font-size: 0.9rem; margin-bottom: .3rem; }
+  .choice-desc { color: var(--mid); font-size: 0.78rem; line-height: 1.5; }
+  /* Form fields */
+  .field { margin-bottom: 1.2rem; }
+  label {
+    display: block; font-size: 0.72rem; font-weight: 500; color: var(--mid);
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: .45rem;
+  }
+  input, select {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Outfit', sans-serif; font-size: 0.9rem;
+    padding: .75rem 1rem; border-radius: 4px; outline: none; transition: border-color .2s;
+    appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--muted); }
+  select option { background: var(--card); }
+  .field-hint { font-size: 0.75rem; color: var(--muted); margin-top: .35rem; }
+  .field-status {
+    font-size: 0.75rem; margin-top: .35rem;
+    display: none;
+  }
+  .field-status.ok  { display: block; color: var(--ok); }
+  .field-status.err { display: block; color: var(--err); }
+  /* Buttons */
+  .btn-primary {
+    width: 100%; background: var(--accent); color: #08090c;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.9rem;
+    padding: .85rem; border: none; border-radius: 4px; cursor: pointer;
+    margin-top: .5rem; transition: opacity .15s;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-back {
+    background: transparent; color: var(--mid); border: 1px solid var(--border);
+    font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 400;
+    padding: .6rem 1.2rem; border-radius: 4px; cursor: pointer;
+    transition: border-color .2s; margin-right: .75rem;
+  }
+  .btn-back:hover { border-color: var(--mid); color: var(--text); }
+  .btn-row { display: flex; align-items: center; margin-top: .5rem; }
+  /* Error */
+  .error-msg {
+    background: rgba(255,71,87,.1); border: 1px solid rgba(255,71,87,.3);
+    color: var(--err); font-size: 0.82rem; padding: .7rem 1rem;
+    border-radius: 4px; margin-bottom: 1.2rem; display: none;
+  }
+  .error-msg.show { display: block; }
+  /* Success */
+  .success-view {
+    text-align: center; padding: 2rem 0;
+  }
+  .success-icon {
+    font-size: 3rem; margin-bottom: 1.2rem;
+  }
+  .success-view h2 {
+    font-family: 'Instrument Serif', serif; font-size: 1.8rem; font-weight: 400; margin-bottom: .6rem;
+  }
+  .success-view p { color: var(--mid); font-size: 0.88rem; line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="/" class="brand">VOX</a>
+
+  <div class="progress">
+    <div class="step-dot active" id="dot0"></div>
+    <div class="step-dot"       id="dot1"></div>
+    <div class="step-dot"       id="dot2"></div>
+  </div>
+
+  <div class="error-msg" id="errMsg"></div>
+
+  <!-- Step 0: Workspace type -->
+  <div class="step active" id="step0">
+    <p class="step-label">Step 1 of 3</p>
+    <h1>How do you want to start?</h1>
+    <p class="sub">Already have an account? <a href="/login">Sign in</a></p>
+    <div class="choice-grid">
+      <div class="choice-card selected" id="card-create" onclick="selectType('create')">
+        <input type="radio" name="wstype" value="create" checked>
+        <div class="choice-icon">🏗</div>
+        <div class="choice-title">Create workspace</div>
+        <div class="choice-desc">Start fresh as admin. You control everything.</div>
+      </div>
+      <div class="choice-card" id="card-join" onclick="selectType('join')">
+        <input type="radio" name="wstype" value="join">
+        <div class="choice-icon">🔑</div>
+        <div class="choice-title">Join workspace</div>
+        <div class="choice-desc">Join an existing team with an invite code.</div>
+      </div>
+    </div>
+    <div class="field" id="invite-field" style="display:none">
+      <label>Invite code <span style="color:var(--muted)">(optional)</span></label>
+      <input type="text" id="inviteCode" placeholder="XXXX-XXXX-XXXX"
+             oninput="validateInvite(this.value)" autocomplete="off">
+      <div class="field-status" id="inviteStatus"></div>
+      <p class="field-hint">No code? Your account will await admin approval.</p>
+    </div>
+    <button class="btn-primary" onclick="goStep(1)">Continue →</button>
+  </div>
+
+  <!-- Step 1: Account -->
+  <div class="step" id="step1">
+    <p class="step-label">Step 2 of 3</p>
+    <h1>Create your account</h1>
+    <p class="sub">You'll use these credentials to log in.</p>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="your-username" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Email <span style="color:var(--muted)">(optional)</span></label>
+      <input type="email" id="email" placeholder="you@company.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Min. 6 characters" autocomplete="new-password">
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(0)">← Back</button>
+      <button class="btn-primary" style="flex:1" onclick="goStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Team / workspace -->
+  <div class="step" id="step2">
+    <p class="step-label">Step 3 of 3</p>
+    <h1>Your team details</h1>
+    <p class="sub">Tell us about your role and department.</p>
+    <div class="field" id="wsNameField" style="display:none">
+      <label>Workspace name</label>
+      <input type="text" id="wsName" placeholder="e.g. Acme Corp" autocomplete="organization">
+    </div>
+    <div class="field">
+      <label>Department</label>
+      <input type="text" id="department" placeholder="e.g. Engineering" autocomplete="organization-title">
+    </div>
+    <div class="field" id="roleField" style="display:none">
+      <label>Role</label>
+      <select id="role">
+        <option value="employee">Employee</option>
+        <option value="manager">Manager</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(1)">← Back</button>
+      <button class="btn-primary" style="flex:1" id="submitBtn" onclick="doSignup()">
+        <span id="submitText">Create account</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div class="step" id="stepSuccess">
+    <div class="success-view">
+      <div class="success-icon" id="successIcon">✅</div>
+      <h2 id="successTitle">Account created!</h2>
+      <p id="successMsg">Taking you to your workspace…</p>
+    </div>
+  </div>
+</div>
+
+<script>
+let wsType = 'create';
+let inviteValid = null;
+let inviteTimer = null;
+
+function selectType(t) {
+  wsType = t;
+  document.getElementById('card-create').classList.toggle('selected', t === 'create');
+  document.getElementById('card-join').classList.toggle('selected', t === 'join');
+  document.getElementById('invite-field').style.display = t === 'join' ? 'block' : 'none';
+}
+
+function validateInvite(val) {
+  clearTimeout(inviteTimer);
+  const st = document.getElementById('inviteStatus');
+  val = val.trim();
+  if (!val) { st.className = 'field-status'; inviteValid = null; return; }
+  st.className = 'field-status ok'; st.textContent = 'Checking…';
+  inviteTimer = setTimeout(async () => {
+    try {
+      const r = await fetch('/api/invite-codes/validate', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({code: val})
+      });
+      const d = await r.json();
+      if (d.valid) {
+        st.className = 'field-status ok'; st.textContent = '✓ Valid code';
+        inviteValid = val;
+      } else {
+        st.className = 'field-status err'; st.textContent = d.reason || 'Invalid code';
+        inviteValid = null;
+      }
+    } catch(e) { st.className = 'field-status err'; st.textContent = 'Could not validate'; }
+  }, 500);
+}
+
+function showErr(msg) {
+  const e = document.getElementById('errMsg');
+  e.textContent = msg; e.classList.add('show');
+  e.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function clearErr() {
+  document.getElementById('errMsg').classList.remove('show');
+}
+
+function goStep(n) {
+  clearErr();
+  if (n === 2) {
+    // Validate step 1 fields
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
+    if (!u) { goStep(1); showErr('Username is required.'); return; }
+    if (p.length < 6) { goStep(1); showErr('Password must be at least 6 characters.'); return; }
+  }
+  ['step0','step1','step2','stepSuccess'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.classList.toggle('active', i === n);
+  });
+  ['dot0','dot1','dot2'].forEach((id,i) => {
+    const d = document.getElementById(id);
+    d.classList.toggle('active', i === n);
+    d.classList.toggle('done', i < n);
+  });
+  // Show/hide optional fields
+  if (n === 2) {
+    document.getElementById('wsNameField').style.display = wsType === 'create' ? 'block' : 'none';
+    document.getElementById('roleField').style.display   = wsType === 'join'   ? 'block' : 'none';
+  }
+}
+
+async function doSignup() {
+  clearErr();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  document.getElementById('submitText').textContent = 'Creating…';
+
+  const body = {
+    workspace_type:   wsType,
+    workspace_name:   document.getElementById('wsName')?.value.trim() || '',
+    workspace_invite: document.getElementById('inviteCode')?.value.trim() || '',
+    username:         document.getElementById('username').value.trim(),
+    email:            document.getElementById('email').value.trim(),
+    password:         document.getElementById('password').value,
+    department:       document.getElementById('department').value.trim() || 'General',
+    role:             document.getElementById('role')?.value || 'employee',
+  };
+
+  try {
+    const r = await fetch('/signup', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (d.ok) {
+      goStep(3);
+      if (d.pending) {
+        document.getElementById('successIcon').textContent = '⏳';
+        document.getElementById('successTitle').textContent = 'Request submitted';
+        document.getElementById('successMsg').textContent = 'An admin will review and approve your account.';
+      } else {
+        setTimeout(() => window.location.href = '/', 1200);
+      }
+    } else {
+      showErr(d.error || 'Sign up failed. Please try again.');
+      goStep(2);
+    }
+  } catch(e) {
+    showErr('Network error. Please try again.');
+    goStep(2);
+  } finally {
+    btn.disabled = false;
+    document.getElementById('submitText').textContent = 'Create account';
+  }
+}
+</script>
+</body>
+</html>
+
