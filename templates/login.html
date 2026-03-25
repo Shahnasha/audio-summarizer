@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOX — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090c; --surface: #0f1117; --card: #141720; --border: #1e2230;
+    --accent: #e8ff47; --text: #e8eaf0; --muted: #5a5f72; --mid: #8b8fa8;
+    --err: #ff4757;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; align-items: stretch;
+  }
+  .split-left {
+    flex: 1; display: flex; flex-direction: column; justify-content: space-between;
+    padding: 3rem; background: var(--surface);
+    border-right: 1px solid var(--border);
+  }
+  .split-right {
+    width: 460px; flex-shrink: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 3rem;
+  }
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .split-left { display: none; }
+    .split-right { width: 100%; padding: 2rem 1.5rem; }
+  }
+  /* Left panel */
+  .brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800; font-size: 1.4rem;
+    letter-spacing: 0.12em; color: var(--accent);
+    text-decoration: none;
+  }
+  .tagline {
+    flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1.5rem;
+  }
+  .tagline h2 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400; font-size: 2.8rem;
+    line-height: 1.08; letter-spacing: -0.015em;
+  }
+  .tagline h2 em { font-style: italic; color: var(--accent); }
+  .tagline p { color: var(--mid); font-size: 0.9rem; line-height: 1.7; max-width: 36ch; }
+  .feature-list { display: flex; flex-direction: column; gap: .6rem; }
+  .feature-row {
+    display: flex; align-items: center; gap: .7rem;
+    font-size: 0.82rem; color: var(--mid);
+  }
+  .feature-row::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+  }
+  .panel-footer { font-size: 0.75rem; color: var(--muted); }
+  /* Right panel — form */
+  .form-header { margin-bottom: 2.5rem; }
+  .form-header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400; font-size: 2rem; letter-spacing: -0.015em;
+  }
+  .form-header p { color: var(--mid); font-size: 0.85rem; margin-top: .4rem; }
+  .form-header p a { color: var(--accent); text-decoration: none; }
+  .field { margin-bottom: 1.2rem; }
+  label {
+    display: block; font-size: 0.75rem; font-weight: 500;
+    color: var(--mid); letter-spacing: 0.04em;
+    text-transform: uppercase; margin-bottom: .5rem;
+  }
+  input {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem; padding: .75rem 1rem;
+    border-radius: 4px; outline: none;
+    transition: border-color .2s;
+  }
+  input:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--muted); }
+  .submit-btn {
+    width: 100%; background: var(--accent); color: #08090c;
+    font-family: 'Outfit', sans-serif; font-weight: 700;
+    font-size: 0.9rem; padding: .85rem;
+    border: none; border-radius: 4px; cursor: pointer;
+    margin-top: .5rem; transition: opacity .15s;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+  }
+  .submit-btn:hover { opacity: 0.85; }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .error-msg {
+    background: rgba(255,71,87,.1); border: 1px solid rgba(255,71,87,.3);
+    color: var(--err); font-size: 0.82rem;
+    padding: .7rem 1rem; border-radius: 4px;
+    margin-bottom: 1.2rem; display: none;
+  }
+  .error-msg.show { display: block; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+  .alt-link { text-align: center; font-size: 0.82rem; color: var(--mid); }
+  .alt-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="split-left">
+  <a href="/" class="brand">VOX</a>
+  <div class="tagline">
+    <h2>Your meetings,<br><em>captured.</em></h2>
+    <p>AI meeting intelligence that runs entirely offline. Transcription, summaries, action items — all on your hardware.</p>
+    <div class="feature-list">
+      <div class="feature-row">Offline Vosk transcription</div>
+      <div class="feature-row">Automatic action item detection</div>
+      <div class="feature-row">Role-based access control</div>
+      <div class="feature-row">Kanban board & escalations</div>
+    </div>
+  </div>
+  <p class="panel-footer">VOX · Runs on your infrastructure · No cloud required</p>
+</div>
+
+<div class="split-right">
+  <div class="form-header">
+    <h1>Sign in</h1>
+    <p>Don't have an account? <a href="/signup">Create one</a></p>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div class="field">
+    <label>Username</label>
+    <input type="text" id="username" placeholder="your-username" autocomplete="username">
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+  </div>
+
+  <button class="submit-btn" id="loginBtn" onclick="doLogin()">
+    <span id="btnText">Sign in</span>
+  </button>
+
+  <hr class="divider">
+  <p class="alt-link"><a href="/">← Back to home</a></p>
+</div>
+
+<script>
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const btn  = document.getElementById('loginBtn');
+  const err  = document.getElementById('errorMsg');
+  const user = document.getElementById('username').value.trim();
+  const pw   = document.getElementById('password').value;
+  err.classList.remove('show');
+  if (!user || !pw) { showErr('Please enter username and password.'); return; }
+  btn.disabled = true;
+  document.getElementById('btnText').textContent = 'Signing in…';
+  try {
+    const r = await fetch('/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: user, password: pw})
+    });
+    const d = await r.json();
+    if (d.ok) { window.location.href = '/'; }
+    else showErr(d.error || 'Login failed.');
+  } catch(e) { showErr('Network error. Please try again.'); }
+  finally { btn.disabled = false; document.getElementById('btnText').textContent = 'Sign in'; }
+}
+
+function showErr(msg) {
+  const e = document.getElementById('errorMsg');
+  e.textContent = msg;
+  e.classList.add('show');
+}
+</script>
+</body>
+</html>
