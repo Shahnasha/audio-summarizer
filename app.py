@@ -10,7 +10,9 @@ from src.asr_vosk import transcribe_file
 from src.summarizer_extractive import summarize_extract
 
 
-
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXT = {'.wav', '.mp3', '.m4a', '.flac', '.ogg', '.webm'}
+VOSK_MODEL_PATH = os.path.join('models', 'vosk-model')
 # Create necessary directories
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs('models', exist_ok=True)
